@@ -157,7 +157,14 @@
     { 
     ptr->newbuffer=(uint8_t *)realloc(ptr->buffer,sizeof(uint8_t)*new_buffer_length);
     ptr->buffer=ptr->newbuffer;
-    ptr->size=new_buffer_length;
+    if(ptr->count==ptr->size)
+        {
+        
+        ptr->head=((ptr->buffer)+(ptr->size));
+        }
+    ptr->size=new_buffer_length;    
+    
+        
     status=cb_success;
     }
   return status;
