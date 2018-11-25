@@ -12,7 +12,7 @@ extern cb *rx;
 extern uint8_t *element_deleted;
 extern uint8_t info[256];
 extern int tx_flag;
-int wait_flag;
+extern int wait_flag;
 buffer_status st;
 
 void UART0_init()
@@ -71,6 +71,8 @@ char uart0_getchar(void)
 void uart0_putchar(char ch)
 {
 	UART0_D = ch;
+	UART0_C2 |= UART0_C2_TIE_MASK;
+
 }
 #endif
 
@@ -128,7 +130,7 @@ if(UART0_S1 & UART0_S1_RDRF_MASK)
 if(UART0_S1 & UART0_S1_TDRE_MASK)
   {
   tx_flag = 1;
-  wait_flag = 1;
+  //wait_flag = 1;
   UART0_C2 &= ~(UART0_C2_TIE_MASK);
   //cb_delete(rx,element_deleted);
   //UART0_D=*(element_deleted);

@@ -44,11 +44,16 @@
 #include "character_count.h"
 #include "report.h"
 
-cb *rx;
-uint8_t *element_deleted;
+cb *rx,*tx;
+
+uint8_t *(element_deleted_tx);
+uint8_t *(element_deleted_rx);
+
 uint8_t* info;
+
 int tx_flag=1;
 int count=0;
+//int wait_flag=0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Definitions
@@ -87,9 +92,15 @@ int main (void)
 	//char uart0_char;
 
 	rx= malloc(sizeof(cb));//&rx_buf; //
-	rx->buffer=malloc(15);
-	cb_init(rx,15);
-	element_deleted= malloc(2);//&recv; //malloc(2);
+	rx->buffer=malloc(1000);
+	cb_init(rx,100);
+
+	tx= malloc(sizeof(cb));//&tx_buf; //
+	tx->buffer=malloc(1000);
+	cb_init(tx,100);
+
+	element_deleted_tx= malloc(2);//&recv; //malloc(2);
+	element_deleted_rx= malloc(2);
 
 	UART0_init();
     //uart0_putstr_nb("BASS");
@@ -125,22 +136,36 @@ int main (void)
 		uart0_putstr("\n\rHello\n\r");
 		putnumber(15);*/
     //UART0_C2|= (UART0_C2_TIE_MASK);
-    buffer_status  status;
+    //buffer_status  status;
+    //uart0_putstr("\n\rHello\n\r");
 		while(1)
 		{
-			if(tx_flag==1)
+			if(cb_isempty(rx)!= cb_empty)
 			{
-				//tx_flag=0;
-				status = cb_delete(rx,element_deleted);
-				if (status != cb_empty)
-				{
-					info = character_count(element_deleted);
-					generate_report(info);
-					UART0_C2 |= (UART0_C2_TIE_MASK);
-				}
+				cb_delete(rx, element_deleted_rx);
+				info = character_count(element_deleted_rx);
+				//UART0_C2 |= (UART0_C2_TIE_MASK);
+				generate_report(info);
+				//UART0_C2 |= (UART0_C2_TIE_MASK);
+
+			}
 		    	/*UART0_D=*(element_deleted);*/
 		    	//UART0_C2 |= (UART0_C2_TIE_MASK);
+				//tx_flag=0;
+
+			if(tx_flag==1 && cb_isempty(tx)!=cb_empty )
+
+			{
+
+				tx_flag=0;
+				cb_delete(tx,element_deleted_tx);
+				uart0_putchar(*element_deleted_tx);
+
 			}
+
+
+
+
 			else
 			{
 		    	//UART0_C2 &= ~(UART0_C2_TIE_MASK);

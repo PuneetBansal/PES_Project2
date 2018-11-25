@@ -59,7 +59,7 @@
 
   buffer_status cb_isempty(cb *ptr)
   {
-  buffer_status status;
+  buffer_status status=cb_not_empty;
   if(ptr==NULL)
     {
     status=null_ptr;
@@ -72,6 +72,7 @@
     {
     status=cb_empty;
     }
+
 
   return status;
 

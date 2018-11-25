@@ -1,5 +1,3 @@
-#ifndef INC_UART_H_
-#define INC_UART_H_
 #include <stdint.h>
 
 
@@ -37,7 +35,3 @@ void uart0_putstr_nb(char *);
 void getinfo(uint8_t *);
 
 
-
-
-
-#endif /* INC_UART_H_ */
