@@ -1,3 +1,14 @@
+/*
+***************************************************************************************************************************************
+FILENAME	:main.c
+DESCRIPTION	:Contains the main body of the program, to run the circular buffer functions and checking the buffer resize capabilty.
+AUTHOR NAME	:Puneet Bansal & Nachiket Kelkar
+TOOLS USED	:GCC, GNU MAKE	
+****************************************************************************************************************************************
+*/
+
+/* Include Header Files*/
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -5,91 +16,48 @@
 #include <time.h>
 
 
-void main()
+int main()
 {
 int i=0;
-uint8_t deleted_element,rand_buff_size;
-buffer_status stat;
-srand(time(0));
-cb *tx_buffer,*check;
-tx_buffer=malloc(sizeof(cb));
-rand_buff_size=(rand()%256);
-tx_buffer->buffer=malloc(sizeof(uint8_t)*rand_buff_size);
-check=malloc(sizeof(cb));
-check->buffer=malloc(sizeof(uint8_t)*rand_buff_size);
+buffer_status stat;				//Making a variable of type buffer_status to store status of the function called.
 
-cb_init(tx_buffer,rand_buff_size);
-//printf("\nStatus for init is %d",stat);
-//stat=cb_isempty(tx_buffer);
-//printf("\nStatus for cb is empty is %d",stat);
-for(i=0;i<rand_buff_size;i++)
+cb *tx_buffer,*check;				/*Making pointer objects to the structure cb*/
+tx_buffer=malloc(sizeof(cb));			/*Allocating memory to the pointer object*/
+tx_buffer->buffer=malloc(sizeof(uint8_t)*10);	/*Allocating memory to the buffer in the structure cb*/
+	
+check=malloc(sizeof(cb));			/*Allocating memory to the pointer object*/
+check->buffer=malloc(sizeof(uint8_t)*10);	/*Allocating memory to the buffer in the structure cb*/	
+
+cb_init(tx_buffer,10);				/*Initialising transmit buffer with size 10*/
+//uint8_t *de;
+
+printf("\nAdding 10 elements to the buffer of size 10 and checking status ");
+for(i=0;i<10;i++)				/*Loop to add 10 elements in the buffer and print the status and count after each addition */
 	{
-	stat=cb_add(tx_buffer,rand()%256);
+	stat=cb_add(tx_buffer,i);		/*Storing the status of the function cb_add in variable :status*/
 	printf("\nstat is %d,",stat);
 	printf("count is %d",tx_buffer->count);
 	}
-//cb_resize(tx_buffer,11);
-//printf("\n\rthe address of ptr->buffer is %p",tx_buffer->buffer);
-//printf("\n\rthe address of ptr->new buffer is %p",tx_buffer->newbuffer);
-/*for(i=0;i<6;i++)
-	{
-	stat=cb_add(tx_buffer,i);
-	printf("\nstat is %d,",stat);
-	printf("count is %d",tx_buffer->count);
-	}*/
 
-//stat=cb_add(tx_buffer,11);
-//printf("\n%d, ",stat);
-//printf("count is %d",tx_buffer->count);
-
-/*
-stat=cb_add(tx_buffer,11);
-printf("\n%d, ",stat);
+/*The below mentioned code, tries to add a new element to the buffer, but it will fail since the buffer is full now*/
+printf("\n\nAdding 11th element to the buffer of size 10");
+stat=cb_add(tx_buffer,i);			/*Storing the status of the function in the variable: status*/
+printf("\nstat is %d,",stat);
 printf("count is %d",tx_buffer->count);
-cb_resize(tx_buffer,15);
 
+printf("\n\nResizing the buffer to size 15");
+
+/*Function to change the buffer size in runtime. Now the size of the buffer is increased to 15 from 10*/
+cb_resize(tx_buffer,15);			
+
+/*Now, we add the 5 more characters to the buffer, and it should accept it*/
+printf("\n\nNow Adding 5 more elements to the buffer ");
 for(i=10;i<15;i++)
 	{
 	stat=cb_add(tx_buffer,i);
-	printf("\nstat is %d,",stat);
-	printf("count is %d",tx_buffer->count);
+	printf("stat is %d,",stat);
+	printf("count is %d\n",tx_buffer->count);
 	}
-//stat=cb_add(tx_buffer,11);
-//printf("\n%d, ",stat);
-//printf("count is %d",tx_buffer->count);
-
-*/
-
-check=tx_buffer;
-printf("\nNow printing contents");
-for(i=0;i<15;i++)
-	{
-        printf("\n%d element is : %d",i,*(check->buffer));
-	check->buffer++;
-	}
-
-/*
-printf("\nNow checking delete");
-cb_delete(tx_buffer,deleted_element);
-printf("\nNow printing contents");
-check=tx_buffer;
-for(i=0;i<11;i++)
-	{
-        printf("\n%d element is : %d",i,*(check->buffer));
-	check->buffer++;
-	}
-*/
-
-
-//buffer_resize()
-
-/*printf("\n\rNow Deleting");
-for(i=0;i<10;i++)
-	{
-	stat=cb_delete(tx_buffer,deleted_element);
-	printf("\n%d",stat);
-	}
-stat=cb_delete(tx_buffer,deleted_element);
-printf("\n%d, ",stat);
-printf("count is %d",tx_buffer->count);*/
+printf("\n");
+return 0;
 }
