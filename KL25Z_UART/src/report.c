@@ -1,145 +1,118 @@
+/*****************************************************************************
+* FILENAME		:report.c													 *
+* DESCRIPTION	:Contains function definition to print the report to screen	 *
+* AUTHOR NAME	:Nachiket Kelkar & Puneet Bansal							 *
+* TOOLS USED	:Kinetis Design Studio										 *
+******************************************************************************/
+
+/* Including the header files */
 #include <report.h>
-#include "circular_buffer.h"
 
-void delay();
-//static int wait=1;
-extern int tx_flag;
+/* Global variables */
+static int wait=1;
 extern int wait_flag;
-extern cb *tx;
+extern int fibo_flag;
 
-#define puneet
-
-#ifndef puneet
+/* Function prints the report to the screen using transmitter interrupt and
+ * toggles the LED when it is waiting for character to be transmitted.
+ */
 void generate_report(uint8_t *report_character)
 {
-	//wait_flag = 1;
-	for(uint8_t i=0; i<127; i++)
+	for(uint8_t i=0; i<127; i++)				// Traverse the counter array to check received characters
 	{
-		if(*(report_character+i) != 0)
+		if(*(report_character+i) != 0)			// Print only if the character is received
 		{
 			wait_flag = 1;
-			//UART0_C2 |= (UART0_C2_TIE_MASK);
-			while(wait_flag == 2 || wait_flag == 1){
-			if(wait_flag == 1){
-			switch(wait)
+			while(wait_flag == 2 || wait_flag == 1)
 			{
-			case 1:
-			{
-				//delay();
-				//UART0_C2 |= (UART0_C2_TIE_MASK);
-				uart0_putchar((char)i);
-
-				//UART0_C2 |= (UART0_C2_TIE_MASK);
-				wait++;
-				wait_flag = 2;
-				UART0_C2 |= (UART0_C2_TIE_MASK);
-				break;
-			}
-			case 2:
-			{
-				//UART0_C2 |= (UART0_C2_TIE_MASK);
-				uart0_putchar(' ');
-				wait++;
-				wait_flag = 2;
-				UART0_C2 |= (UART0_C2_TIE_MASK);
-				break;
-			}
-			case 3 :
-			{
-				//UART0_C2 |= (UART0_C2_TIE_MASK);
-				uart0_putchar('-');
-				wait++;
-				wait_flag = 2;
-				UART0_C2 |= (UART0_C2_TIE_MASK);
-				break;
-			}
-			case 4 :
-			{
-				//UART0_C2 |= (UART0_C2_TIE_MASK);
-				uart0_putchar(' ');
-				wait++;
-				wait_flag = 2;
-				UART0_C2 |= (UART0_C2_TIE_MASK);
-				break;
-			}
-			case 5:
-			{
-				//UART0_C2 |= (UART0_C2_TIE_MASK);
-				putnumber(*(report_character+i));
-				wait++;
-				wait_flag = 2;
-				UART0_C2 |= (UART0_C2_TIE_MASK);
-				break;
-			}
-			case 6:
-			{
-				//UART0_C2 |= (UART0_C2_TIE_MASK);
-				uart0_putchar('\n');
-				wait++;
-				wait_flag = 2;
-				UART0_C2 |= (UART0_C2_TIE_MASK);
-				break;
-			}
-			case 7:
-			{
-				//UART0_C2 |= (UART0_C2_TIE_MASK);
-				uart0_putchar('\r');
-
-				wait = 1;
-				wait_flag = 0;
-
-				UART0_C2 |= (UART0_C2_TIE_MASK);
-				break;
-			}
-			}
-			}
-			}
-		}
-
-	}
-	//tx_flag=0;
-	/*uart0_putchar('\n');
-	UART0_C2 |= (UART0_C2_TIE_MASK);
-	delay();*/
-}
-
-#else
-
-void generate_report(uint8_t *report_character)
-{
-	//wait_flag=1;
-	uint8_t num,rem;
-	for(uint8_t i=0; i<127; i++)
-		{
-		num=*(report_character+i);
-		if(*(report_character+i) != 0)
+				if(wait_flag == 1)
 				{
-
-				cb_add(tx,(char)i);
-				cb_add(tx,' ');
-				cb_add(tx,'-');
-				while(num!=0)
+					switch(wait)				// To send the next character after interrupt occurs
 					{
-					rem=num%10;
-					num=num/10;
-					if(num!=0)
-					cb_add(tx,num+48);
-					else
-					cb_add(tx,rem+48);
+					case 1:
+					{
+						uart0_putchar((char)i);
+						wait++;
+						wait_flag = 2;
+						UART0_C2 |= (UART0_C2_TIE_MASK);	// Enable transmitter interrupt
+						break;
 					}
-
-				cb_add(tx,'\n');
-				cb_add(tx,'\r');
-
+					case 2:
+					{
+						uart0_putchar(' ');
+						wait++;
+						wait_flag = 2;
+						UART0_C2 |= (UART0_C2_TIE_MASK);	// Enable transmitter interrupt
+						break;
+					}
+					case 3 :
+					{
+						uart0_putchar('-');
+						wait++;
+						wait_flag = 2;
+						UART0_C2 |= (UART0_C2_TIE_MASK);	// Enable transmitter interrupt
+						break;
+					}
+					case 4 :
+					{
+						uart0_putchar(' ');
+						wait++;
+						wait_flag = 2;
+						UART0_C2 |= (UART0_C2_TIE_MASK);	// Enable transmitter interrupt
+						break;
+					}
+					case 5:
+					{
+						putnumber(*(report_character+i));
+						wait++;
+						wait_flag = 2;
+						UART0_C2 |= (UART0_C2_TIE_MASK);	// Enable transmitter interrupt
+						break;
+					}
+					case 6:
+					{
+						uart0_putchar('\n');
+						wait++;
+						wait_flag = 2;
+						UART0_C2 |= (UART0_C2_TIE_MASK);	// Enable transmitter interrupt
+						break;
+					}
+					case 7:
+					{
+						uart0_putchar('\r');
+						wait = 9;
+						wait_flag = 2;
+						UART0_C2 |= (UART0_C2_TIE_MASK);	// Enable transmitter interrupt
+						break;
+					}
+					default:
+					{
+						wait = 1;
+						wait_flag = 0;
+					}
+					}
 				}
-
+			}
 		}
-	//wait_flag=0;
-
-}
-#endif
-
-void delay()
-{
-	for(uint16_t z=0;z<1000;z++);
+		else			// Toggle the LED while waiting for character to be transmitted
+		{
+			static int change1 = 0;
+			if(change1 == 0)
+			{
+				LED1_TOGGLE;
+				change1 = 1;
+			}
+			else if(change1 == 1)
+			{
+				LED2_TOGGLE;
+				change1 = 2;
+			}
+			else
+			{
+				LED3_TOGGLE;
+				change1 = 0;
+			}
+		}
+	}
+	fibo_flag = 1;		//Flag to print the next fibonacci number
 }
